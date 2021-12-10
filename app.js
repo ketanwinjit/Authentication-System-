@@ -8,7 +8,7 @@ const express = require("express");
 const app = express();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-
+const cookieParser = require("cookie-parser");
 const User = require("./model/user");
 const isUserAuthenticated = require("./middleware/auth");
 
@@ -16,6 +16,7 @@ const isUserAuthenticated = require("./middleware/auth");
  * ? MIDDLEWARES
  */
 app.use(express.json());
+app.use(cookieParser());
 
 app.get("/", (req, res) => {
   res.send("<h6>Authentication System</h6>");
@@ -105,7 +106,14 @@ app.post("/login", async (req, res) => {
 
       user.token = token;
       user.password = undefined;
-      res.status(200).json(user);
+      // res.status(200).json(user);
+      // If we want to send token in cookies.
+
+      const options = {
+        expires: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000),
+        httpOnly: true, // Only accessable by backend developer.
+      };
+      res.status(200).cookie("token", token, options).json(user);
     }
 
     res.status(400).send("Email or Password is incorrect");

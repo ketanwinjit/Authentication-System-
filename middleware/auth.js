@@ -4,11 +4,11 @@
 const jwt = require("jsonwebtoken");
 
 const isUserAuthenticated = (req, res, next) => {
-  console.log("MiddleWare Req", req.header);
+  console.log("MiddleWare Req", req.cookies);
   const token =
-    req.header("Authorization").replace("Bearer ", "") ||
     req.cookies.token ||
-    req.body.token;
+    req.body.token ||
+    req.header("Authorization").replace("Bearer ", "");
 
   if (!token) {
     return res.status(403).send("Token is missing");
